@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: vulnscan-pro-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /ping
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: SELF_URL
+        value: https://vulnscan-pro-api.onrender.com   # update after first deploy
+
+# Cron job to keep Render free tier awake (pings every 14 min)
+  - type: cron
+    name: vulnscan-keepalive
+    runtime: image
+    image:
+      url: curlimages/curl
+    schedule: "*/14 * * * *"   # every 14 minutes
+    command: curl -s https://vulnscan-pro-api.onrender.com/ping
